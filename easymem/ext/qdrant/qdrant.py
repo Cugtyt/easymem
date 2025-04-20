@@ -1,51 +1,43 @@
 """Qdrant Database Interface."""
 
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from typing import Any
 
-from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams
+from qdrant_client import AsyncQdrantClient
 
 from easymem.db import MemoryDB
 from easymem.message import BasicMemMessage
 
 
+@dataclass
 class QdrantMemoryDB(MemoryDB):
     """Qdrant database class for EasyMem."""
 
-    client_kwargs: dict[str, Any]
-    vector_kwargs: dict[str, Any]
+    client_kwargs: dict[str, Any] | None = None
 
-    def connect(self) -> None:
+    async def connect(self) -> None:
         """Connect to the database."""
         if not self.client_kwargs:
-            self.client_kwargs = {"location": ":memory"}
-        if not self.vector_kwargs:
-            self.vector_kwargs = {"size": 128, "distance": Distance.DOT}
+            self.client_kwargs = {"location": ":memory:"}
 
-        self.client = QdrantClient(**self.client_kwargs)
-        self.client.create_collection(
-            collection_name=self.collection_name,
-            vectors_config=VectorParams(**self.vector_kwargs),
-        )
+        self.client = AsyncQdrantClient(**self.client_kwargs)
 
-    def add(self, mid: str, message: BasicMemMessage) -> None:
+    async def add(self, message: BasicMemMessage) -> None:
         """Add a message to the database."""
         metadata = {k: v for k, v in asdict(message).items() if k != "content"}
-        self.client.add(
+        await self.client.add(
             collection_name=self.collection_name,
             documents=[message.content],
             metadata=[metadata],
-            ids=[mid],
         )
 
-    def query(self, query: str) -> list[dict]:
+    async def query(self, query: str) -> list[dict]:
         """Query the database."""
         if not query:
             msg = "Query must be a non-empty string."
             raise ValueError(msg)
 
-        results = self.client.query(
+        results = await self.client.query(
             collection_name=self.collection_name,
             query_text=query,
             limit=self.limit,

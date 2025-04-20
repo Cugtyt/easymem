@@ -1,10 +1,10 @@
 """Basic memory message class."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
 class BasicMemMessage:
     """Basic memory message class."""
 
-    content: str
+    content: str = field(metadata={"description": "The content of memory."})

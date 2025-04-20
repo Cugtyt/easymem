@@ -14,13 +14,13 @@ class MemoryDB(ABC):
     limit: int = 10
 
     @abstractmethod
-    def connect(self) -> None:
+    async def connect(self) -> None:
         """Connect to the database."""
 
     @abstractmethod
-    def add(self, mid: str, message: BasicMemMessage) -> None:
+    async def add(self, message: BasicMemMessage) -> None:
         """Add a message to the database."""
 
     @abstractmethod
-    def query(self, query: str) -> list[dict]:
+    async def query(self, query: str) -> list[dict]:
         """Query the database."""

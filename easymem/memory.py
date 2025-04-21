@@ -1,6 +1,6 @@
 """EasyMem."""
 
-from dataclasses import fields
+from dataclasses import dataclass, fields
 from typing import Any
 
 from easymem.db import MemoryDB
@@ -9,24 +9,32 @@ from easymem.message import BasicMemMessage
 from easymem.records import MemoryRecord
 
 
+@dataclass
 class EasyMem:
     """EasyMem class."""
 
-    async def build(
-        self,
+    message_type: type[BasicMemMessage]
+    db: MemoryDB
+
+    @classmethod
+    async def create(
+        cls,
         message_type: type[BasicMemMessage] = BasicMemMessage,
         db: MemoryDB | None = None,
-    ) -> None:
+    ) -> "EasyMem":
         """Initialize EasyMem."""
         if not issubclass(message_type, BasicMemMessage):
             msg = f"{message_type} must be a subclass of BasicMemMessage."
             raise TypeError(msg)
-        if "__dataclass_fields__" not in message_type.__dict__:
-            msg = f"{message_type} must be a dataclass."
+        if db and not isinstance(db, MemoryDB):
+            msg = f"{db} must be an instance of MemoryDB."
             raise TypeError(msg)
-        self.message_type: type[BasicMemMessage] = message_type
-        self.db: MemoryDB = db or QdrantMemoryDB()
-        await self.db.connect()
+
+        if db is None:
+            db = QdrantMemoryDB()
+        await db.connect()
+
+        return cls(message_type=message_type, db=db)
 
     async def insert(self, **kwargs: Any) -> None:  # noqa: ANN401
         """Insert data into indexes."""

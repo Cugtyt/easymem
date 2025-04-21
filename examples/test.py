@@ -17,10 +17,9 @@ class MyMemMessage(BasicMemMessage):
 
 
 async def main() -> None:  # noqa: D103
-    mem = EasyMem()
-    await mem.build(message_type=MyMemMessage)
+    mem = await EasyMem.create(message_type=MyMemMessage)
     await mem.insert(content="Hello, world!")
-    await mem.query("Hello")
+    print(await mem.query("Hello"))
 
 
 if __name__ == "__main__":

@@ -1,14 +1,15 @@
 """Memory record classes."""
 
-from dataclasses import dataclass
+from pydantic import BaseModel, ConfigDict
 
 from easymem.message import BasicMemMessage
 
 
-@dataclass
-class MemoryRecord:
+class BasicMemoryRecord(BaseModel):
     """Memory records."""
 
-    id: str
+    model_config = ConfigDict(extra="ignore")
+
+    id: str | int
     message: BasicMemMessage
     score: float

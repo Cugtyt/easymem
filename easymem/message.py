@@ -1,10 +1,14 @@
 """Basic memory message class."""
 
-from dataclasses import dataclass, field
+from pydantic import BaseModel, ConfigDict, Field
 
 
-@dataclass
-class BasicMemMessage:
+class BasicMemMessage(BaseModel):
     """Basic memory message class."""
 
-    content: str = field(metadata={"description": "The content of memory."})
+    model_config = ConfigDict(extra="ignore")
+
+    content: str = Field(
+        ...,
+        description="The content of the message.",
+    )

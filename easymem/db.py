@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from easymem.message import BasicMemMessage
+from easymem.records import BasicMemoryRecord
 
 
 @dataclass
@@ -22,5 +23,5 @@ class MemoryDB(ABC):
         """Add a message to the database."""
 
     @abstractmethod
-    async def query(self, query: str) -> list[dict]:
+    async def query(self, query: str) -> list[BasicMemoryRecord]:
         """Query the database."""

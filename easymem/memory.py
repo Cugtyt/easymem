@@ -1,17 +1,19 @@
 """EasyMem."""
 
-from dataclasses import dataclass, fields
 from typing import Any
+
+from pydantic import BaseModel, ConfigDict
 
 from easymem.db import MemoryDB
 from easymem.ext import QdrantMemoryDB
 from easymem.message import BasicMemMessage
-from easymem.records import MemoryRecord
+from easymem.records import BasicMemoryRecord
 
 
-@dataclass
-class EasyMem:
+class EasyMem(BaseModel):
     """EasyMem class."""
+
+    model_config = ConfigDict(extra="ignore")
 
     message_type: type[BasicMemMessage]
     db: MemoryDB
@@ -40,19 +42,6 @@ class EasyMem:
         """Insert data into indexes."""
         await self.db.add(self.message_type(**kwargs))
 
-    async def query(self, query: str) -> list[MemoryRecord]:
+    async def query(self, query: str) -> list[BasicMemoryRecord]:
         """Query the indexes."""
-        allowed = {f.name for f in fields(self.message_type)}
-        results = await self.db.query(query)
-
-        records: list[MemoryRecord] = []
-        for result in results:
-            msg_kwargs = {k: v for k, v in result.items() if k in allowed}
-            records.append(
-                MemoryRecord(
-                    id=result["id"],
-                    message=self.message_type(**msg_kwargs),
-                    score=result["score"],
-                ),
-            )
-        return records
+        return await self.db.query(query)

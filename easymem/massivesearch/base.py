@@ -10,5 +10,5 @@ class MassiveSearchSpecBase(ABC, BaseModel):
     """Base class for massive search spec."""
 
     @abstractmethod
-    def build(self, key: str) -> Any:
+    def build(self, key: str) -> Any:  # noqa: ANN401
         """Build the massive search output."""

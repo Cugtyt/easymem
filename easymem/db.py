@@ -30,5 +30,5 @@ class MemoryDB(ABC):
         """Query the database."""
 
     @abstractmethod
-    async def massive_search(self, query: dict) -> list[BasicMemoryRecord]:
+    async def massivequery(self, query: str) -> list[BasicMemoryRecord]:
         """Massive search in the database."""

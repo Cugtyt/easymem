@@ -4,9 +4,10 @@ from dataclasses import dataclass
 from typing import Any
 
 from qdrant_client import AsyncQdrantClient
+from qdrant_client.models import Condition, Filter
 
 from easymem.db import MemoryDB
-from easymem.massivesearch.base import MassiveSearchSpecBase
+from easymem.ext.qdrant.msearch.vector import QdrantVectorMassiveSearch
 from easymem.message import BasicMemMessage
 from easymem.records import BasicMemoryRecord
 
@@ -64,11 +65,48 @@ class QdrantMemoryDB(MemoryDB):
             for result in results
         ]
 
-    async def massive_search(
+    async def massivequery(
         self,
-        query: dict[str, MassiveSearchSpecBase],
+        query: str,
     ) -> list[BasicMemoryRecord]:
         """Massive search in the database."""
         if not self.client:
             msg = "QdrantMemoryDB is not connected. Call connect() first."
             raise RuntimeError(msg)
+
+        if not query:
+            msg = "Query must be a non-empty dictionary."
+            raise ValueError(msg)
+
+        if not isinstance(query["content"], QdrantVectorMassiveSearch):
+            msg = (
+                "Query must contain a 'content' key with a "
+                "QdrantVectorMassiveSearch value."
+            )
+            raise TypeError(msg)
+
+        content_query = query["content"].query
+
+        filters: list[Condition] = []
+        for key, search in query.items():
+            if isinstance(search, QdrantVectorMassiveSearch):
+                continue
+            filters.append(search.build(key))
+
+        results = await self.client.query(
+            collection_name=self.collection_name,
+            query_text=content_query,
+            query_filter=Filter(must=filters),
+            limit=self.limit,
+        )
+        return [
+            self.record_type(
+                id=result.id,
+                score=result.score,
+                message=self.message_type(
+                    **{**result.metadata, "content": result.document},
+                ),
+                **result.metadata,
+            )
+            for result in results
+        ]

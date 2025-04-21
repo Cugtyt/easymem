@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict
 
 from easymem.db import MemoryDB
 from easymem.ext import QdrantMemoryDB
+from easymem.massivesearch.base import MassiveSearchSpecBase
 from easymem.message import BasicMemMessage
 from easymem.records import BasicMemoryRecord
 
@@ -45,3 +46,16 @@ class EasyMem(BaseModel):
     async def query(self, query: str) -> list[BasicMemoryRecord]:
         """Query the indexes."""
         return await self.db.query(query)
+
+    async def massivequery(self, query: str) -> list[BasicMemoryRecord]:
+        """Massive query the indexes."""
+        if not isinstance(query, dict):
+            msg = "Query must be a dictionary."
+            raise TypeError(msg)
+
+        for value in query.values():
+            if not isinstance(value, MassiveSearchSpecBase):
+                msg = f"{value} must be an instance of MassiveSearchSpecBase."
+                raise TypeError(msg)
+
+        return await self.db.massivequery(query)

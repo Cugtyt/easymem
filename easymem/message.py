@@ -1,6 +1,12 @@
 """Basic memory message class."""
 
+from typing import Annotated, TypeVar
+
 from pydantic import BaseModel, ConfigDict, Field
+
+from easymem.massivesearch.vector import VectorMassiveSearchSpecBase
+
+MemMessageT = TypeVar("MemMessageT", bound="BasicMemMessage")
 
 
 class BasicMemMessage(BaseModel):
@@ -8,7 +14,11 @@ class BasicMemMessage(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
 
-    content: str = Field(
-        ...,
-        description="The content of the message.",
-    )
+    content: Annotated[
+        str,
+        Field(
+            ...,
+            description="The content of the message.",
+        ),
+        VectorMassiveSearchSpecBase,
+    ]

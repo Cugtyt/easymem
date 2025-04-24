@@ -6,14 +6,14 @@ from typing import Any
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import Condition, Filter
 
-from easymem.db import MemoryDB
+from easymem.base.easymem import EasyMemBase
+from easymem.base.record import MemQueryResultBase
 from easymem.ext.qdrant.msearch.vector import QdrantVectorMassiveSearch
 from easymem.message import BasicMemMessage
-from easymem.records import BasicMemoryRecord
 
 
 @dataclass
-class QdrantMemoryDB(MemoryDB):
+class QdrantMemoryDB(EasyMemBase):
     """Qdrant database class for EasyMem."""
 
     client_kwargs: dict[str, Any] | None = None
@@ -38,7 +38,7 @@ class QdrantMemoryDB(MemoryDB):
             metadata=[metadata],
         )
 
-    async def query(self, query: str) -> list[BasicMemoryRecord]:
+    async def query(self, query: str) -> list[MemQueryResultBase]:
         """Query the database."""
         if not query:
             msg = "Query must be a non-empty string."
@@ -68,7 +68,7 @@ class QdrantMemoryDB(MemoryDB):
     async def massivequery(
         self,
         query: str,
-    ) -> list[BasicMemoryRecord]:
+    ) -> list[MemQueryResultBase]:
         """Massive search in the database."""
         if not self.client:
             msg = "QdrantMemoryDB is not connected. Call connect() first."

@@ -4,11 +4,10 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
-from easymem.db import MemoryDB
+from easymem.base.easymem import EasyMemBase
+from easymem.base.record import MemQueryResultBase
 from easymem.ext import QdrantMemoryDB
-from easymem.massivesearch.base import MassiveSearchSpecBase
 from easymem.message import BasicMemMessage
-from easymem.records import BasicMemoryRecord
 
 
 class EasyMem(BaseModel):
@@ -17,19 +16,20 @@ class EasyMem(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     message_type: type[BasicMemMessage]
-    db: MemoryDB
+    db: EasyMemBase
+    massive_search_format_model: type[BaseModel]
 
     @classmethod
     async def create(
         cls,
         message_type: type[BasicMemMessage] = BasicMemMessage,
-        db: MemoryDB | None = None,
+        db: EasyMemBase | None = None,
     ) -> "EasyMem":
         """Initialize EasyMem."""
         if not issubclass(message_type, BasicMemMessage):
             msg = f"{message_type} must be a subclass of BasicMemMessage."
             raise TypeError(msg)
-        if db and not isinstance(db, MemoryDB):
+        if db and not isinstance(db, EasyMemBase):
             msg = f"{db} must be an instance of MemoryDB."
             raise TypeError(msg)
 
@@ -43,19 +43,10 @@ class EasyMem(BaseModel):
         """Insert data into indexes."""
         await self.db.add(self.message_type(**kwargs))
 
-    async def query(self, query: str) -> list[BasicMemoryRecord]:
+    async def query(self, query: str) -> list[MemQueryResultBase]:
         """Query the indexes."""
         return await self.db.query(query)
 
-    async def massivequery(self, query: str) -> list[BasicMemoryRecord]:
+    async def massivequery(self, query: str) -> list[MemQueryResultBase]:
         """Massive query the indexes."""
-        if not isinstance(query, dict):
-            msg = "Query must be a dictionary."
-            raise TypeError(msg)
-
-        for value in query.values():
-            if not isinstance(value, MassiveSearchSpecBase):
-                msg = f"{value} must be an instance of MassiveSearchSpecBase."
-                raise TypeError(msg)
-
         return await self.db.massivequery(query)

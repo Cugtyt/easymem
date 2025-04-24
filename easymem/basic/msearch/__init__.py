@@ -1,0 +1,1 @@
+"""Basic massive search module."""

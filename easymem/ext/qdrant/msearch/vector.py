@@ -9,7 +9,7 @@ from easymem.massivesearch.vector import VectorMassiveSearchSpecBase
 class QdrantVectorMassiveSearch(QdrantMassiveSearch, VectorMassiveSearchSpecBase):
     """Vector massive search for Qdrant."""
 
-    def build(self, key: str) -> FieldCondition:
+    def search_task(self, key: str) -> FieldCondition:
         """Build the massive search output.
 
         This one will be ignored in Qdrant as it support vector search natively.

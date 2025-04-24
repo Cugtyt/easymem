@@ -11,7 +11,7 @@ from easymem.massivesearch.datetime import DateMassiveSearchSpecBase
 class QdrantDateMassiveSearch(QdrantMassiveSearch, DateMassiveSearchSpecBase):
     """Date massive search for Qdrant."""
 
-    def build(self, key: str) -> FieldCondition:
+    def search_task(self, key: str) -> FieldCondition:
         """Build the massive search output."""
         return FieldCondition(
             key=key,

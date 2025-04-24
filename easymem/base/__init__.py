@@ -1,0 +1,1 @@
+"""EasyMem base module."""

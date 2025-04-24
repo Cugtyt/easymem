@@ -23,6 +23,7 @@ class MassiveSearchSpecBase(
     ) -> MassiveSearchR_co:
         """Build the massive search output."""
 
+    @classmethod
     @abstractmethod
-    def build_msearch_format_model(self) -> type[BaseModel]:
+    def build_format_model(cls) -> type[BaseModel]:
         """Build the massive search format model."""

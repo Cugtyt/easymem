@@ -1,6 +1,7 @@
 """Base model classes."""
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -46,7 +47,15 @@ The final search logic is:
 
 This structure allows you to create complex search patterns that capture
 different aspects of the user's intent while maintaining logical clarity.
+
+The following is the index information:
+
+{index_context}
 """
+
+
+class ModelResponseError(Exception):
+    """Model Response Error."""
 
 
 class ModelBase(ABC):
@@ -56,6 +65,24 @@ class ModelBase(ABC):
         """Initialize the model with a system prompt."""
         self.system_prompt = system_prompt or DEFAULT_STSTEM_PROMPT
 
+    def build_messages(self, query: str, index_content: str) -> list[dict]:
+        """Build the messages for the Azure OpenAI service."""
+        return [
+            {
+                "role": "system",
+                "content": self.system_prompt.format(index_context=index_content),
+            },
+            {
+                "role": "user",
+                "content": query,
+            },
+        ]
+
     @abstractmethod
-    async def response(self, query: str, format_model: type[BaseModel]) -> dict:
+    async def response(
+        self,
+        query: str,
+        index_content: str,
+        format_model: type[BaseModel],
+    ) -> dict[str, Any]:
         """Get a response from the model."""

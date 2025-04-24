@@ -1,54 +1,19 @@
 """Sample for EasyMem."""  # noqa: INP001
 
-# from datetime import datetime
-
-# from pydantic import Field
-
-# from easymem import BasicMemMessage, EasyMem
+from easymem.basic.easymem import BasicEasyMem
+from easymem.basic.message import BasicMemMessage
 
 
-# class MyMemMessage(BasicMemMessage):
-#     """Custom message class for EasyMem."""
-
-#     date: datetime = Field(
-#         default_factory=datetime.now,
-#         description="The date of the message.",
-#     )
-
-
-# async def main() -> None:
-#     mem = await EasyMem.create(message_type=MyMemMessage)
-#     await mem.insert(content="Hello, world!")
-#     print(await mem.query("Hello"))
+async def main() -> None:
+    mem = BasicEasyMem()
+    await mem.connect()
+    await mem.add(BasicMemMessage(content="Hello", date="2023-10-01"))
+    await mem.add(BasicMemMessage(content="World", date="2023-10-02"))
+    await mem.add(BasicMemMessage(content="Python", date="2023-10-03"))
+    await mem.massivequery("find Hello")
 
 
-# if __name__ == "__main__":
-#     import asyncio
+if __name__ == "__main__":
+    import asyncio
 
-#     asyncio.run(main())
-
-from typing import Annotated, get_type_hints
-
-from pydantic import BaseModel, Field
-
-
-class MyModel(BaseModel):
-    config: str = Field(
-        ...,
-        description="The config of the model.",
-        examples=[
-            "example1",
-            "example2",
-        ],
-    )
-
-
-class Test(BaseModel):
-    a: Annotated[
-        str,
-        Field(description="A string field.", examples=["example1", "example2"]),
-        MyModel,
-    ]
-
-
-print(get_type_hints(Test, include_extras=True)['a'].__metadata__[1])
+    asyncio.run(main())

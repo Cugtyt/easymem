@@ -5,7 +5,7 @@ from typing import Annotated
 from pydantic import ConfigDict, Field
 
 from easymem.base.message import MemMessageBase
-from easymem.basic.msearch.datetime import BasicDateMassiveSearch
+from easymem.basic.msearch.date import BasicDateMassiveSearch
 from easymem.basic.msearch.text import BasicTextMassiveSearch
 
 

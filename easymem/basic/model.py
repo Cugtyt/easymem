@@ -1,11 +1,13 @@
 """Model for Basic EasyMem."""
 
 import json
+from typing import Any
 
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from openai import AsyncAzureOpenAI
+from pydantic import BaseModel, ValidationError
 
-from easymem.base.model import ModelBase
+from easymem.base.model import ModelBase, ModelResponseError
 
 
 class AzureOpenAIClient(ModelBase):
@@ -29,40 +31,34 @@ class AzureOpenAIClient(ModelBase):
             azure_ad_token_provider=self.token_provider,
         )
 
-    def build_messages(self, query: str) -> list[dict]:
-        """Build the messages for the Azure OpenAI service."""
-        return [
-            {
-                "role": "system",
-                "content": self.system_prompt,
-            },
-            {
-                "role": "user",
-                "content": query,
-            },
-        ]
-
     async def response(
         self,
         query: str,
-        format_model: type,
-    ) -> dict:
+        index_content: str,
+        format_model: type[BaseModel],
+    ) -> dict[str, Any]:
         """Get a response from the Azure OpenAI service."""
         r = await self.client.beta.chat.completions.parse(
             model=self.model,
-            messages=self.build_messages(query), # type: ignore  # noqa: PGH003
+            messages=self.build_messages(query, index_content),  # type: ignore  # noqa: PGH003
             response_format=format_model,
             temperature=self.temperature,
         )
         content_str = r.choices[0].message.content
         if not content_str or not isinstance(content_str, str):
             msg = "Empty response from Azure OpenAI."
-            raise ValueError(msg)
+            raise ModelResponseError(msg)
         try:
-            return json.loads(content_str)
+            res = json.loads(content_str)
+            format_model(**res)
+        except ValidationError as e:
+            msg = f"Validation error: {e}"
+            raise ModelResponseError(msg) from e
         except json.JSONDecodeError as e:
             msg = f"Failed to parse JSON response: {e}"
-            raise ValueError(msg) from e
+            raise ModelResponseError(msg) from e
         except Exception as e:
             msg = f"Unexpected error: {e}"
-            raise ValueError(msg) from e
+            raise ModelResponseError(msg) from e
+        else:
+            return res

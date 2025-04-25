@@ -1,54 +1,71 @@
 """Base class for memory messages."""
 
 import json
-from dataclasses import dataclass, fields
-from typing import Any, TypeVar, get_type_hints
+from dataclasses import asdict, dataclass, fields, is_dataclass
+from typing import Any, get_type_hints
 
 from pydantic import BaseModel, Field, create_model
 
 from easymem.base.massivesearch import MassiveSearchSpecBase
 
 
-@dataclass(slots=True)
-class MemMessageBase:
-    """Base class for memory messages."""
+class MessageHelper:
+    """EasyMem message helper class."""
 
-    def __post_init__(self) -> None:
-        """Post-initialization method to set up the message."""
-        self.massive_searches()
+    def __init__(self, message_type: type) -> None:
+        """Initialize the EasyMem message helper."""
+        self.message_type = message_type
+        self.type_check()
+        self.message_fields = {f.name for f in fields(message_type)}
+        self.parse_message_metadata()
+        self.build_msearch_format_model()
 
-    @classmethod
-    def build_prompt(cls) -> str:
-        """Return a tiny JSON description of the dataclass fields."""
-        schema = {f.name: str(f.type) for f in fields(cls)}
-        return json.dumps(schema)
+    def type_check(self) -> None:
+        """Check if the message type is a dataclass with __slots__."""
+        if not is_dataclass(self.message_type) or not hasattr(
+            self.message_type,
+            "__slots__",
+        ):
+            msg = (
+                f"{self.message_type} must be a dataclass with __slots__ attribute. "
+                "Usage: `@dataclass(slots=True)`"
+            )
+            raise TypeError(msg)
 
-    @classmethod
-    def massive_searches(cls) -> dict[str, type[MassiveSearchSpecBase]]:
-        """Extract MassiveSearchSpecBase annotations from type hints."""
-        searches: dict[str, type[MassiveSearchSpecBase]] = {}
-        for field_name in get_type_hints(cls):
-            metadata = get_type_hints(cls, include_extras=True)[field_name].__metadata__
-            msearch_specs = [
-                t
-                for t in metadata
-                if isinstance(t, type) and issubclass(t, MassiveSearchSpecBase)
-            ]
-            if len(msearch_specs) != 1:
+    def parse_message_metadata(self) -> None:
+        """Parse the message metadata."""
+        self.massive_search_types: dict[str, type[MassiveSearchSpecBase]] = {}
+        index_context: dict[str, dict] = {}
+        for field_name in self.message_fields:
+            metadata = get_type_hints(self.message_type, include_extras=True)[
+                field_name
+            ].__metadata__
+            if not metadata:
                 msg = (
-                    f"{cls.__name__}.{field_name} must have exactly ONE "
-                    "MassiveSearchSpecBase subclass in its Annotated metadata. "
-                    "example: `field: Annotated[str, SomeMassiveSearch]`"
+                    f"{self.message_type.__name__}.{field_name} must have "
+                    "Annotated metadata. "
                 )
                 raise TypeError(msg)
-            searches[field_name] = msearch_specs[0]
-        return searches
+            message_fields = [t for t in metadata if isinstance(t, MessageField)]
+            if len(message_fields) != 1:
+                msg = (
+                    f"{self.message_type.__name__}.{field_name} must have exactly ONE "
+                    "MessageField in its Annotated metadata. "
+                    "example: `field: Annotated[str, MessageField(...)]`"
+                )
+                raise TypeError(msg)
 
-    @classmethod
-    def build_msearch_format_model(cls) -> type[BaseModel]:
+            self.massive_search_types[field_name] = message_fields[0].msearch
+            index_context[field_name] = asdict(
+                message_fields[0],
+                dict_factory=MessageField.dict_factory,
+            )
+        self.index_context = json.dumps(index_context)
+
+    def build_msearch_format_model(self) -> None:
         """Build the massive search format model."""
         format_model_fields: dict[str, Any] = {"sub_query": (str, ...)}
-        searches = cls.massive_searches()
+        searches = self.massive_search_types
         for field_name, msearch_type in searches.items():
             format_model_fields[field_name] = (
                 msearch_type,
@@ -61,11 +78,23 @@ class MemMessageBase:
             __base__=BaseModel,
         )
 
-        return create_model(
+        self.format_model = create_model(
             "MultiQueryFormat",
             queries=(list[single_query_format], Field(...)),  # type: ignore[valid-type]
             __base__=BaseModel,
         )
 
 
-MemMessageT = TypeVar("MemMessageT", bound=MemMessageBase)
+@dataclass
+class MessageField:
+    """Message field model."""
+
+    description: str
+    examples: list[str]
+    msearch: type[MassiveSearchSpecBase]
+
+    @staticmethod
+    def dict_factory(f: list[tuple]) -> dict[str, Any]:
+        """Create a dictionary from the field."""
+        exclude_fields = {"msearch"}
+        return {k: v for (k, v) in f if k not in exclude_fields and v is not None}

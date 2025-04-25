@@ -1,36 +1,32 @@
 """Basic memory message class."""
 
 from dataclasses import dataclass
-from typing import Annotated, TypeVar
+from typing import Annotated
 
-from pydantic import Field
-
-from easymem.base.message import MemMessageBase
+from easymem.base.message import MessageField
 from easymem.basic.msearch.date import BasicDateMassiveSearch
 from easymem.basic.msearch.text import BasicTextMassiveSearch
 
 
 @dataclass(slots=True)
-class BasicMemMessage(MemMessageBase):
+class BasicMemMessage:
     """Basic memory message class."""
 
     content: Annotated[
         str,
-        Field(
-            ...,
+        MessageField(
             description="The content of the message.",
             examples=[
                 "I love programming in Python!",
                 "The weather is great today.",
             ],
+            msearch=BasicTextMassiveSearch,
         ),
-        BasicTextMassiveSearch,
     ]
 
     date: Annotated[
         str,
-        Field(
-            ...,
+        MessageField(
             description=(
                 "The date of the message; data starts from 2000-01-01, "
                 "current date is 2025-05-01."
@@ -39,9 +35,6 @@ class BasicMemMessage(MemMessageBase):
                 "2023-10-01",
                 "2023-10-02",
             ],
+            msearch=BasicDateMassiveSearch,
         ),
-        BasicDateMassiveSearch,
     ]
-
-
-BasicMemMessageT = TypeVar("BasicMemMessageT", bound=BasicMemMessage)

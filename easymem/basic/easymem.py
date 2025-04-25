@@ -2,14 +2,17 @@
 
 import uuid
 from dataclasses import asdict, fields
+from typing import TypeVar
 
 import numpy as np
 
 from easymem.base.easymem import EasyMemBase
 from easymem.base.massivesearch import MassiveSearchQueryT
 from easymem.base.model import ModelBase
-from easymem.basic.message import BasicMemMessage, BasicMemMessageT
+from easymem.basic.message import BasicMemMessage
 from easymem.basic.model import AzureOpenAIClient
+
+BasicMemMessageT = TypeVar("BasicMemMessageT", bound=BasicMemMessage)
 
 
 class BasicEasyMem(EasyMemBase[BasicMemMessageT]):

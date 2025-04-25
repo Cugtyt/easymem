@@ -82,7 +82,7 @@ class QdrantEasyMem(EasyMemBase[QdrantMemMessageT]):
 
             for r in cur_result:
                 metadata = {
-                    k: v for k, v in r.metadata.items() if k in self.message_fileds
+                    k: v for k, v in r.metadata.items() if k in self.message_fields
                 }
                 results.append(
                     self.message_type(

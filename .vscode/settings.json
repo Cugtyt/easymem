@@ -18,6 +18,7 @@
         "massivequery",
         "massivesearch",
         "msearch",
-        "ndarray"
+        "ndarray",
+        "Qdrant"
     ]
 }

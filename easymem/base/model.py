@@ -5,7 +5,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-DEFAULT_STSTEM_PROMPT = """Fill the search engine query arguments
+DEFAULT_SYSTEM_PROMPT = """Fill the search engine query arguments
 based on the user's intent and current index information.
 
 You will break down the user's intent into one or multiple queries,
@@ -63,7 +63,7 @@ class ModelBase(ABC):
 
     def __init__(self, system_prompt: str | None = None) -> None:
         """Initialize the model with a system prompt."""
-        self.system_prompt = system_prompt or DEFAULT_STSTEM_PROMPT
+        self.system_prompt = system_prompt or DEFAULT_SYSTEM_PROMPT
 
     def build_messages(self, query: str, index_content: str) -> list[dict]:
         """Build the messages for the Azure OpenAI service."""

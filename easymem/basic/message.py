@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Annotated, TypeVar
 
-from pydantic import ConfigDict, Field
+from pydantic import Field
 
 from easymem.base.message import MemMessageBase
 from easymem.basic.msearch.date import BasicDateMassiveSearch
@@ -13,8 +13,6 @@ from easymem.basic.msearch.text import BasicTextMassiveSearch
 @dataclass(slots=True)
 class BasicMemMessage(MemMessageBase):
     """Basic memory message class."""
-
-    model_config = ConfigDict(extra="ignore")
 
     content: Annotated[
         str,
@@ -33,7 +31,10 @@ class BasicMemMessage(MemMessageBase):
         str,
         Field(
             ...,
-            description="The date of the message, the data starts from 2000-01-01, current date is 2025-05-01.",
+            description=(
+                "The date of the message; data starts from 2000-01-01, "
+                "current date is 2025-05-01."
+            ),
             examples=[
                 "2023-10-01",
                 "2023-10-02",

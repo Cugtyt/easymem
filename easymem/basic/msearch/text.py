@@ -24,7 +24,6 @@ class BasicTextMassiveSearch(MassiveSearchSpecBase):
     ]
 
     async def search_task(self, col: int, data: np.ndarray) -> np.ndarray:
-        """Build the massive search output."""
         """Search for messages containing the keywords."""
         keyword = self.keyword
         text_column = data[:, col].astype(str)

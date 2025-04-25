@@ -8,7 +8,7 @@ import numpy as np
 from easymem.base.easymem import EasyMemBase
 from easymem.base.massivesearch import MassiveSearchQueryT
 from easymem.base.model import ModelBase
-from easymem.basic.message import BasicMemMessageT
+from easymem.basic.message import BasicMemMessage, BasicMemMessageT
 from easymem.basic.model import AzureOpenAIClient
 
 
@@ -21,6 +21,14 @@ class BasicEasyMem(EasyMemBase[BasicMemMessageT]):
         model: ModelBase | None = None,
     ) -> None:
         """Initialize the BasicEasyMem."""
+        if not issubclass(message_type, BasicMemMessage):
+            msg = (
+                "message_type must be a subclass of BasicMemMessage, "
+                f"not {type(message_type)}"
+            )
+            raise TypeError(
+                msg,
+            )
         super().__init__(message_type)
         self.model = model or AzureOpenAIClient()
         self.columns = {f.name: i for i, f in enumerate(fields(self.message_type), 1)}

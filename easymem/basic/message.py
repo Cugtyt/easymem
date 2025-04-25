@@ -33,7 +33,7 @@ class BasicMemMessage(MemMessageBase):
         str,
         Field(
             ...,
-            description="The date of the message.",
+            description="The date of the message, the data starts from 2000-01-01, current date is 2025-05-01.",
             examples=[
                 "2023-10-01",
                 "2023-10-02",

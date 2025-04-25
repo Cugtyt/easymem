@@ -1,6 +1,7 @@
 """Basic memory message class."""
 
-from typing import Annotated
+from dataclasses import dataclass
+from typing import Annotated, TypeVar
 
 from pydantic import ConfigDict, Field
 
@@ -9,6 +10,7 @@ from easymem.basic.msearch.date import BasicDateMassiveSearch
 from easymem.basic.msearch.text import BasicTextMassiveSearch
 
 
+@dataclass(slots=True)
 class BasicMemMessage(MemMessageBase):
     """Basic memory message class."""
 
@@ -39,3 +41,6 @@ class BasicMemMessage(MemMessageBase):
         ),
         BasicDateMassiveSearch,
     ]
+
+
+BasicMemMessageT = TypeVar("BasicMemMessageT", bound=BasicMemMessage)

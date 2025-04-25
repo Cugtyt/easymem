@@ -20,11 +20,6 @@ class BasicTextMassiveSearch(MassiveSearchSpecBase):
                 "This should be a list of strings."
                 "The keywords are used to filter the results."
             ),
-            examples=[
-                ["Python", "programming"],
-                ["weather", "sunny"],
-                ["machine learning", "AI"],
-            ],
         ),
     ]
 

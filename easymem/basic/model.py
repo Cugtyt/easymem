@@ -18,7 +18,7 @@ class AzureOpenAIClient(ModelBase):
         super().__init__()
         self.endpoint = "https://smarttsg-gpt.openai.azure.com/"
         self.api_version = "2024-08-01-preview"
-        self.model = "gpt-4o"
+        self.model = "gpt-4o-mini"
         self.temperature = 0
         self.token_provider = get_bearer_token_provider(
             DefaultAzureCredential(),

@@ -1,13 +1,11 @@
 """Massive search types for BasicEasyMem."""
 
-from abc import abstractmethod
-from typing import Protocol, runtime_checkable
+from abc import ABC, abstractmethod
 
 import numpy as np
 
 
-@runtime_checkable
-class BasicMassiveSearchProtocol(Protocol):
+class BasicMassiveSearchProtocol(ABC):
     """Basic massive search protocol."""
 
     @abstractmethod

@@ -18,17 +18,25 @@ async def basic() -> None:
     await mem.add(BasicMemMessage(content="Hello", date="2020-10-01"))
     await mem.add(BasicMemMessage(content="World", date="2023-10-02"))
     await mem.add(BasicMemMessage(content="Python", date="2023-10-03"))
-    result, query = await mem.massivequery("find Hello and Python")
-    print("Query:", json.dumps(query))
+    user_query = "find Hello and Python"
+    print("User:\n\t", user_query)
+    result, query = await mem.massivequery(user_query)
+    print("Query:\n\t", json.dumps(query))
     print("Result:")
     for item in result:
-        print(item)
+        print("\t", item)
 
-    result, query = await mem.massivequery("find Hello and Python before 2023-01-01")
-    print("Query:", json.dumps(query))
+    print("-" * 20)
+
+    user_query = "find Hello or Python before 2023-01-01"
+    print("User:\n\t", user_query)
+    result, query = await mem.massivequery(user_query)
+    print("Query:\n\t", json.dumps(query))
     print("Result:")
     for item in result:
-        print(item)
+        print("\t", item)
+
+    print("-" * 20)
 
 
 @dataclass(slots=True)
@@ -48,17 +56,25 @@ async def basic_ext() -> None:
     await mem.add(MyBasicMemMessage(content="Hello", date="2020-10-01"))
     await mem.add(MyBasicMemMessage(content="World", date="2023-10-02"))
     await mem.add(MyBasicMemMessage(content="Python", date="2023-10-03"))
-    result, query = await mem.massivequery("find Hello and Python")
-    print("Query:", json.dumps(query))
+    user_query = "find Hello and Python"
+    print("User:\n\t", user_query)
+    result, query = await mem.massivequery(user_query)
+    print("Query:\n\t", json.dumps(query))
     print("Result:")
     for item in result:
-        print(item)
+        print("\t", item)
 
-    result, query = await mem.massivequery("find Hello or Python before 2023-01-01")
-    print("Query:", json.dumps(query))
+    print("-" * 20)
+
+    user_query = "find Hello or Python before 2023-01-01"
+    print("User:\n\t", user_query)
+    result, query = await mem.massivequery(user_query)
+    print("Query:\n\t", json.dumps(query))
     print("Result:")
     for item in result:
-        print(item)
+        print("\t", item)
+
+    print("-" * 20)
 
 
 async def qdrant():
@@ -66,17 +82,25 @@ async def qdrant():
     await mem.add(QdrantMemMessage(content="Hello", datetime="2020-10-01T00:00:00Z"))
     await mem.add(QdrantMemMessage(content="World", datetime="2023-10-02T00:00:00Z"))
     await mem.add(QdrantMemMessage(content="Python", datetime="2023-10-03T00:00:00Z"))
-    result, query = await mem.massivequery("find Hello and Python")
-    print("Query:", json.dumps(query))
+    user_query = "find Hello and Python"
+    print("User:\n\t", user_query)
+    result, query = await mem.massivequery(user_query)
+    print("Query:\n\t", query)
     print("Result:")
     for item in result:
-        print(item)
+        print("\t", item)
 
-    result, query = await mem.massivequery("find Hello and Python before 2023-01-01")
-    print("Query:", json.dumps(query))
+    print("-" * 20)
+
+    user_query = "find Hello or Python before 2023-01-01"
+    print("User:\n\t", user_query)
+    result, query = await mem.massivequery(user_query)
+    print("Query:\n\t", query)
     print("Result:")
     for item in result:
-        print(item)
+        print("\t", item)
+
+    print("-" * 20)
 
 
 @dataclass(slots=True)
@@ -96,23 +120,31 @@ async def qdrant_ext():
     await mem.add(MyQdrantMemMessage(content="Hello", datetime="2020-10-01T00:00:00Z"))
     await mem.add(MyQdrantMemMessage(content="World", datetime="2023-10-02T00:00:00Z"))
     await mem.add(MyQdrantMemMessage(content="Python", datetime="2023-10-03T00:00:00Z"))
-    result, query = await mem.massivequery("find Hello and Python")
-    print("Query:", json.dumps(query))
+    user_query = "find Hello and Python"
+    print("User:\n\t", user_query)
+    result, query = await mem.massivequery(user_query)
+    print("Query:\n\t", query)
     print("Result:")
     for item in result:
-        print(item)
+        print("\t", item)
 
-    result, query = await mem.massivequery("find Hello or Python before 2023-01-01")
-    print("Query:", json.dumps(query))
+    print("-" * 20)
+
+    user_query = "find Hello or Python before 2023-01-01"
+    print("User:\n\t", user_query)
+    result, query = await mem.massivequery(user_query)
+    print("Query:\n\t", query)
     print("Result:")
     for item in result:
-        print(item)
+        print("\t", item)
+
+    print("-" * 20)
 
 
 if __name__ == "__main__":
     import asyncio
 
-    # asyncio.run(basic())
-    # asyncio.run(qdrant())
-    # asyncio.run(basic_ext())
+    asyncio.run(basic())
+    asyncio.run(qdrant())
+    asyncio.run(basic_ext())
     asyncio.run(qdrant_ext())

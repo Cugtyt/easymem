@@ -1,12 +1,16 @@
 """Qdrant vector massive search module for EasyMem."""
 
+from dataclasses import dataclass
 from typing import Annotated
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 from qdrant_client.models import Condition, Filter
 
+from easymem.ext.qdrant.massivesearch import QdrantMassiveSearchProtocol
 
-class QdrantVectorMassiveSearch(BaseModel):
+
+@dataclass(slots=True)
+class QdrantVectorMassiveSearch(QdrantMassiveSearchProtocol):
     """Qdrant vector massive search module for EasyMem."""
 
     query: Annotated[

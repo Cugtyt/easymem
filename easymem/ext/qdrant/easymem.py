@@ -1,6 +1,7 @@
 """Qdrant EasyMem."""
 
 from dataclasses import asdict
+from typing import Any
 
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import Filter
@@ -31,7 +32,7 @@ class QdrantEasyMem(EasyMemBase):
         self.model = model or AzureOpenAIClient()
 
     @EasyMemBase.valid_message
-    async def add(self, message: QdrantMemMessage) -> None:
+    async def add(self, message: Any) -> None:  # noqa: ANN401
         """Add a message to the database."""
         metadata = {k: v for k, v in asdict(message).items() if k != "content"}
         await self.client.add(
@@ -43,7 +44,7 @@ class QdrantEasyMem(EasyMemBase):
     async def massivequery(
         self,
         query: str,
-    ) -> tuple[list[QdrantMemMessage], MassiveSearchQueryT]:
+    ) -> tuple[list[Any], MassiveSearchQueryT]:
         """Massive search in the database."""
         massive_search_query = await self.model.response(
             query,

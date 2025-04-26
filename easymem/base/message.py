@@ -97,7 +97,7 @@ class MessageHelper:
 
 @dataclass
 class MessageField:
-    """Message field model."""
+    """Message field."""
 
     description: str
     examples: list[str]

@@ -1,36 +1,46 @@
 """Qdrant datetime massive search module for EasyMem."""
 
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, Field
 from qdrant_client.models import Condition, DatetimeRange, FieldCondition
 
+from easymem.base.massivesearch import MassiveSearchField
+from easymem.ext.qdrant.massivesearch import QdrantMassiveSearchProtocol
 
-class QdrantDatetimeMassiveSearch(BaseModel):
+
+@dataclass(slots=True)
+class QdrantDatetimeMassiveSearch(QdrantMassiveSearchProtocol):
     """Qdrant date massive search module for EasyMem."""
 
     start_datetime: Annotated[
         str,
-        Field(
-            ...,
+        MassiveSearchField(
             description=(
                 "Start datetime for the date range search. "
                 "This should be in the format YYYY-MM-DDTHH:MM:SSZ."
                 "The datetime is inclusive."
             ),
+            examples=[
+                "2023-10-01T00:00:00Z",
+                "2023-10-02T12:30:00Z",
+            ],
         ),
     ]
 
     end_datetime: Annotated[
         str,
-        Field(
-            ...,
+        MassiveSearchField(
             description=(
                 "End datetime for the date range search. "
                 "This should be in the format YYYY-MM-DDTHH:MM:SSZ."
                 "The datetime is inclusive."
             ),
+            examples=[
+                "2023-10-01T00:00:00Z",
+                "2023-10-02T12:30:00Z",
+            ],
         ),
     ]
 

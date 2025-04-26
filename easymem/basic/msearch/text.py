@@ -1,23 +1,30 @@
 """Basic text Massive Search."""
 
+from dataclasses import dataclass
 from typing import Annotated
 
 import numpy as np
-from pydantic import BaseModel, Field
+
+from easymem.base.massivesearch import MassiveSearchField
+from easymem.basic.massivesearch import BasicMassiveSearchProtocol
 
 
-class BasicTextMassiveSearch(BaseModel):
+@dataclass(slots=True)
+class BasicTextMassiveSearch(BasicMassiveSearchProtocol):
     """Basic text massive search spec."""
 
     keyword: Annotated[
         list[str],
-        Field(
-            ...,
+        MassiveSearchField(
             description=(
                 "Keywords for the text search. "
                 "This should be a list of strings."
                 "The keywords are used to filter the results."
             ),
+            examples=[
+                ["Python", "programming"],
+                ["weather", "great"],
+            ],
         ),
     ]
 

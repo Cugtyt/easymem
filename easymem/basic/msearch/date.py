@@ -3,12 +3,10 @@
 from typing import Annotated
 
 import numpy as np
-from pydantic import Field
-
-from easymem.basic.easymem import BasicMassiveSearchProtocol
+from pydantic import BaseModel, Field
 
 
-class BasicDateMassiveSearch(BasicMassiveSearchProtocol):
+class BasicDateMassiveSearch(BaseModel):
     """Basic date massive search."""
 
     start_date: Annotated[

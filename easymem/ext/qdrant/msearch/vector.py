@@ -2,13 +2,11 @@
 
 from typing import Annotated
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 from qdrant_client.models import Condition, Filter
 
-from easymem.ext.qdrant.massivesearch import QdrantMassiveSearchProtocol
 
-
-class QdrantVectorMassiveSearch(QdrantMassiveSearchProtocol):
+class QdrantVectorMassiveSearch(BaseModel):
     """Qdrant vector massive search module for EasyMem."""
 
     query: Annotated[

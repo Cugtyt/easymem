@@ -1,13 +1,13 @@
 """Massive search types for QdrantEasyMem."""
 
 from abc import abstractmethod
+from typing import Protocol, runtime_checkable
 
 from qdrant_client.models import Condition
 
-from easymem.base.massivesearch import MassiveSearchProtocol
 
-
-class QdrantMassiveSearchProtocol(MassiveSearchProtocol):
+@runtime_checkable
+class QdrantMassiveSearchProtocol(Protocol):
     """Qdrant massive search protocol."""
 
     @abstractmethod

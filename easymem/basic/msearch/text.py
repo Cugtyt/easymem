@@ -3,12 +3,10 @@
 from typing import Annotated
 
 import numpy as np
-from pydantic import Field
-
-from easymem.basic.easymem import BasicMassiveSearchProtocol
+from pydantic import BaseModel, Field
 
 
-class BasicTextMassiveSearch(BasicMassiveSearchProtocol):
+class BasicTextMassiveSearch(BaseModel):
     """Basic text massive search spec."""
 
     keyword: Annotated[
@@ -25,8 +23,10 @@ class BasicTextMassiveSearch(BasicMassiveSearchProtocol):
 
     async def search_task(self, col: int, data: np.ndarray) -> np.ndarray:
         """Search for messages containing the keywords."""
-        keyword = self.keyword
+        if not self.keyword:
+            return data
+
         text_column = data[:, col].astype(str)
 
-        mask = np.array([any(k in text for k in keyword) for text in text_column])
+        mask = np.array([any(k in text for k in self.keyword) for text in text_column])
         return data[mask]

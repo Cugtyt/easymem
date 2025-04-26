@@ -1,48 +1,38 @@
 """Basic EasyMem module."""
 
 import uuid
-from dataclasses import asdict, fields, is_dataclass
+from dataclasses import asdict, fields
+from typing import Any
 
 import numpy as np
 
-from easymem.base.easymem import (
-    EasyMemBase,
-)
+from easymem.base.easymem import EasyMemBase
 from easymem.base.model import MassiveSearchQueryT, ModelBase
 from easymem.basic.massivesearch import BasicMassiveSearchProtocol
 from easymem.basic.message import BasicMemMessage
 from easymem.basic.model import AzureOpenAIClient
 
 
-class BasicEasyMem(EasyMemBase[BasicMemMessage]):
+class BasicEasyMem(EasyMemBase):
     """Basic EasyMem class."""
 
     def __init__(
         self,
-        message_type: type[BasicMemMessage] = BasicMemMessage,
-        massive_search_protocol: type = BasicMassiveSearchProtocol,
+        message_type: type = BasicMemMessage,
         model: ModelBase | None = None,
     ) -> None:
         """Initialize the BasicEasyMem."""
-        super().__init__(message_type, massive_search_protocol)
+        super().__init__(message_type, BasicMassiveSearchProtocol)
         self.model = model or AzureOpenAIClient()
         self.columns = {f.name: i for i, f in enumerate(fields(self.message_type), 1)}
         self.memory: np.ndarray = np.empty((0, len(self.columns) + 1), dtype=object)
 
-    async def add(self, message: BasicMemMessage) -> None:
+    @EasyMemBase.valid_message
+    async def add(self, message: Any) -> None:  # noqa: ANN401
         """Add a message to the database."""
-        if not is_dataclass(message):
-            msg = "message must be a dataclass."
-            raise TypeError(msg)
-        if not isinstance(message, self.message_type):
-            msg = (
-                f"message must be an instance of {self.message_type}, "
-                f"not {type(message)}"
-            )
-            raise TypeError(msg)
         message_id = str(uuid.uuid4())
         message_content = list(
-            asdict(message).values(),
+            asdict(message).values(),  # type: ignore  # noqa: PGH003
         )
         self.memory = np.append(
             self.memory,
@@ -53,7 +43,7 @@ class BasicEasyMem(EasyMemBase[BasicMemMessage]):
     async def massivequery(
         self,
         query: str,
-    ) -> tuple[list[BasicMemMessage], MassiveSearchQueryT]:
+    ) -> tuple[list[Any], MassiveSearchQueryT]:
         """Massive search in the database."""
         massive_search_query = await self.model.response(
             query,
@@ -83,7 +73,7 @@ class BasicEasyMem(EasyMemBase[BasicMemMessage]):
         merged = (
             np.vstack(partial_results)
             if partial_results
-            else np.empty((0, 3), dtype=object)
+            else np.empty((0, len(self.columns) + 1), dtype=object)
         )
 
         _, unique_idx = np.unique(merged[:, 0], return_index=True)

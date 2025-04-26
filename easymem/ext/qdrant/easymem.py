@@ -12,25 +12,25 @@ from easymem.ext.qdrant.massivesearch import QdrantMassiveSearchProtocol
 from easymem.ext.qdrant.message import QdrantMemMessage
 
 
-class QdrantEasyMem(EasyMemBase[QdrantMemMessage]):
+class QdrantEasyMem(EasyMemBase):
     """Qdrant EasyMem class."""
 
     def __init__(
         self,
         message_type: type = QdrantMemMessage,
-        massive_search_protocol: type = QdrantMassiveSearchProtocol,
         qdrant_client_args: dict | None = None,
         collection_name: str = "easymem",
         model: ModelBase | None = None,
     ) -> None:
         """Initialize the QdrantEasyMem."""
-        super().__init__(message_type, massive_search_protocol)
+        super().__init__(message_type, QdrantMassiveSearchProtocol)
         self.client = AsyncQdrantClient(
             **(qdrant_client_args or {"location": ":memory:"}),
         )
         self.collection_name = collection_name
         self.model = model or AzureOpenAIClient()
 
+    @EasyMemBase.valid_message
     async def add(self, message: QdrantMemMessage) -> None:
         """Add a message to the database."""
         metadata = {k: v for k, v in asdict(message).items() if k != "content"}

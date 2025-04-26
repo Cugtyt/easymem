@@ -6,8 +6,6 @@ from typing import Any, get_type_hints
 
 from pydantic import BaseModel, Field, create_model
 
-from easymem.base.massivesearch import MassiveSearchProtocol
-
 
 class MessageHelper:
     """EasyMem message helper class."""
@@ -15,7 +13,7 @@ class MessageHelper:
     def __init__(
         self,
         message_type: type,
-        protocol: type[MassiveSearchProtocol],
+        protocol: type,
     ) -> None:
         """Initialize the EasyMem message helper."""
         self.message_type = message_type
@@ -39,7 +37,7 @@ class MessageHelper:
 
     def parse_message_metadata(self) -> None:
         """Parse the message metadata."""
-        self.massive_search_types: dict[str, type[MassiveSearchProtocol]] = {}
+        self.massive_search_types: dict[str, type] = {}
         index_context: dict[str, dict] = {}
         for field_name in self.message_fields:
             metadata = get_type_hints(self.message_type, include_extras=True)[

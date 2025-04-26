@@ -19,6 +19,7 @@
         "massivesearch",
         "msearch",
         "ndarray",
-        "Qdrant"
+        "Qdrant",
+        "warpper"
     ]
 }

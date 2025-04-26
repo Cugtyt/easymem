@@ -4,8 +4,6 @@ import uuid
 from dataclasses import asdict, fields
 from typing import Any
 
-import numpy as np
-
 from easymem.base.easymem import EasyMemBase
 from easymem.base.model import MassiveSearchQueryT, ModelBase
 from easymem.basic.massivesearch import BasicMassiveSearchProtocol
@@ -43,7 +41,7 @@ class BasicEasyMem(EasyMemBase):
             self.index_context,
             self.format_model,
         )
-        partial_results = []
+        merged = set()
         for single_query in massive_search_query:
             single_query_result = []
             for key, search_args in single_query.items():
@@ -56,21 +54,15 @@ class BasicEasyMem(EasyMemBase):
                         data=self.memory,
                     ),
                 )
+
             if single_query_result:
-                common_rows = single_query_result[0]
-                for arr in single_query_result[1:]:
-                    common_rows = common_rows[np.isin(common_rows[:, 0], arr[:, 0])]
-                if common_rows.size:
-                    partial_results.append(common_rows)
+                common_result = set(single_query_result[0])
+                for i in range(1, len(single_query_result)):
+                    common_result = common_result.intersection(
+                        single_query_result[i],
+                    )
 
-        merged = (
-            np.vstack(partial_results)
-            if partial_results
-            else np.empty((0, len(self.columns) + 1), dtype=object)
-        )
-
-        _, unique_idx = np.unique(merged[:, 0], return_index=True)
-        merged = merged[unique_idx]
+                merged.update(common_result)
 
         return (
             [

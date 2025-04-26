@@ -1,18 +1,15 @@
 """Massive search types for EasyMem."""
 
-from abc import ABC, abstractmethod
-from typing import Any, Generic, ParamSpec, TypeVar
+from abc import abstractmethod
+from typing import Generic, ParamSpec, TypeVar
 
 from pydantic import BaseModel, ConfigDict
 
 MassiveSearchP = ParamSpec("MassiveSearchP")
 MassiveSearchR_co = TypeVar("MassiveSearchR_co", covariant=True)
 
-MassiveSearchQueryT = list[dict[str, Any]]
 
-
-class MassiveSearchSpecBase(
-    ABC,
+class MassiveSearchProtocol(
     BaseModel,
     Generic[MassiveSearchP, MassiveSearchR_co],
 ):

@@ -6,15 +6,20 @@ from typing import Any, get_type_hints
 
 from pydantic import BaseModel, Field, create_model
 
-from easymem.base.massivesearch import MassiveSearchSpecBase
+from easymem.base.massivesearch import MassiveSearchProtocol
 
 
 class MessageHelper:
     """EasyMem message helper class."""
 
-    def __init__(self, message_type: type) -> None:
+    def __init__(
+        self,
+        message_type: type,
+        protocol: type[MassiveSearchProtocol],
+    ) -> None:
         """Initialize the EasyMem message helper."""
         self.message_type = message_type
+        self.protocol = protocol
         self.type_check()
         self.message_fields = {f.name for f in fields(message_type)}
         self.parse_message_metadata()
@@ -34,7 +39,7 @@ class MessageHelper:
 
     def parse_message_metadata(self) -> None:
         """Parse the message metadata."""
-        self.massive_search_types: dict[str, type[MassiveSearchSpecBase]] = {}
+        self.massive_search_types: dict[str, type[MassiveSearchProtocol]] = {}
         index_context: dict[str, dict] = {}
         for field_name in self.message_fields:
             metadata = get_type_hints(self.message_type, include_extras=True)[
@@ -52,6 +57,13 @@ class MessageHelper:
                     f"{self.message_type.__name__}.{field_name} must have exactly ONE "
                     "MessageField in its Annotated metadata. "
                     "example: `field: Annotated[str, MessageField(...)]`"
+                )
+                raise TypeError(msg)
+
+            if not issubclass(message_fields[0].msearch, self.protocol):
+                msg = (
+                    f"{self.message_type.__name__}.{field_name} must have a "
+                    f"{self.protocol.__name__} subclass in its Annotated metadata. "
                 )
                 raise TypeError(msg)
 
@@ -91,7 +103,7 @@ class MessageField:
 
     description: str
     examples: list[str]
-    msearch: type[MassiveSearchSpecBase]
+    msearch: type
 
     @staticmethod
     def dict_factory(f: list[tuple]) -> dict[str, Any]:

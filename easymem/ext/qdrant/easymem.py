@@ -6,40 +6,32 @@ from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import Filter
 
 from easymem.base.easymem import EasyMemBase
-from easymem.base.massivesearch import MassiveSearchQueryT
-from easymem.base.model import ModelBase
+from easymem.base.model import MassiveSearchQueryT, ModelBase
 from easymem.basic.model import AzureOpenAIClient
-from easymem.ext.qdrant.message import QdrantMemMessage, QdrantMemMessageT
+from easymem.ext.qdrant.massivesearch import QdrantMassiveSearchProtocol
+from easymem.ext.qdrant.message import QdrantMemMessage
 
 
-class QdrantEasyMem(EasyMemBase[QdrantMemMessageT]):
+class QdrantEasyMem(EasyMemBase[QdrantMemMessage]):
     """Qdrant EasyMem class."""
 
     def __init__(
         self,
-        message_type: type[QdrantMemMessageT],
+        message_type: type = QdrantMemMessage,
+        massive_search_protocol: type = QdrantMassiveSearchProtocol,
         qdrant_client_args: dict | None = None,
         collection_name: str = "easymem",
         model: ModelBase | None = None,
     ) -> None:
         """Initialize the QdrantEasyMem."""
-        if not issubclass(message_type, QdrantMemMessage):
-            msg = (
-                "message_type must be a subclass of QdrantMemMessage, "
-                f"not {type(message_type)}"
-            )
-            raise TypeError(
-                msg,
-            )
-
-        super().__init__(message_type)
+        super().__init__(message_type, massive_search_protocol)
         self.client = AsyncQdrantClient(
             **(qdrant_client_args or {"location": ":memory:"}),
         )
         self.collection_name = collection_name
         self.model = model or AzureOpenAIClient()
 
-    async def add(self, message: QdrantMemMessageT) -> None:
+    async def add(self, message: QdrantMemMessage) -> None:
         """Add a message to the database."""
         metadata = {k: v for k, v in asdict(message).items() if k != "content"}
         await self.client.add(
@@ -51,14 +43,13 @@ class QdrantEasyMem(EasyMemBase[QdrantMemMessageT]):
     async def massivequery(
         self,
         query: str,
-    ) -> tuple[list[QdrantMemMessageT], MassiveSearchQueryT]:
+    ) -> tuple[list[QdrantMemMessage], MassiveSearchQueryT]:
         """Massive search in the database."""
-        massive_search_response = await self.model.response(
+        massive_search_query = await self.model.response(
             query,
             self.index_context,
             self.format_model,
         )
-        massive_search_query = massive_search_response["queries"]
         results = []
         for single_query in massive_search_query:
             filters = []

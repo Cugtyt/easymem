@@ -54,6 +54,9 @@ The following is the index information:
 """
 
 
+MassiveSearchQueryT = list[dict[str, Any]]
+
+
 class ModelResponseError(Exception):
     """Model Response Error."""
 
@@ -84,5 +87,5 @@ class ModelBase(ABC):
         query: str,
         index_content: str,
         format_model: type[BaseModel],
-    ) -> dict[str, Any]:
+    ) -> MassiveSearchQueryT:
         """Get a response from the model."""

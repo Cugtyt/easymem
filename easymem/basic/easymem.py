@@ -1,46 +1,49 @@
 """Basic EasyMem module."""
 
 import uuid
-from dataclasses import asdict, fields
-from typing import TypeVar
+from dataclasses import asdict, fields, is_dataclass
 
 import numpy as np
 
-from easymem.base.easymem import EasyMemBase
-from easymem.base.massivesearch import MassiveSearchQueryT
-from easymem.base.model import ModelBase
+from easymem.base.easymem import (
+    EasyMemBase,
+)
+from easymem.base.model import MassiveSearchQueryT, ModelBase
+from easymem.basic.massivesearch import BasicMassiveSearchProtocol
 from easymem.basic.message import BasicMemMessage
 from easymem.basic.model import AzureOpenAIClient
 
-BasicMemMessageT = TypeVar("BasicMemMessageT", bound=BasicMemMessage)
 
-
-class BasicEasyMem(EasyMemBase[BasicMemMessageT]):
+class BasicEasyMem(EasyMemBase[BasicMemMessage]):
     """Basic EasyMem class."""
 
     def __init__(
         self,
-        message_type: type[BasicMemMessageT],
+        message_type: type[BasicMemMessage] = BasicMemMessage,
+        massive_search_protocol: type = BasicMassiveSearchProtocol,
         model: ModelBase | None = None,
     ) -> None:
         """Initialize the BasicEasyMem."""
-        if not issubclass(message_type, BasicMemMessage):
-            msg = (
-                "message_type must be a subclass of BasicMemMessage, "
-                f"not {type(message_type)}"
-            )
-            raise TypeError(
-                msg,
-            )
-        super().__init__(message_type)
+        super().__init__(message_type, massive_search_protocol)
         self.model = model or AzureOpenAIClient()
         self.columns = {f.name: i for i, f in enumerate(fields(self.message_type), 1)}
         self.memory: np.ndarray = np.empty((0, len(self.columns) + 1), dtype=object)
 
-    async def add(self, message: BasicMemMessageT) -> None:
+    async def add(self, message: BasicMemMessage) -> None:
         """Add a message to the database."""
+        if not is_dataclass(message):
+            msg = "message must be a dataclass."
+            raise TypeError(msg)
+        if not isinstance(message, self.message_type):
+            msg = (
+                f"message must be an instance of {self.message_type}, "
+                f"not {type(message)}"
+            )
+            raise TypeError(msg)
         message_id = str(uuid.uuid4())
-        message_content = list(asdict(message).values())
+        message_content = list(
+            asdict(message).values(),
+        )
         self.memory = np.append(
             self.memory,
             np.array([[message_id, *message_content]], dtype=object),
@@ -50,14 +53,13 @@ class BasicEasyMem(EasyMemBase[BasicMemMessageT]):
     async def massivequery(
         self,
         query: str,
-    ) -> tuple[list[BasicMemMessageT], MassiveSearchQueryT]:
+    ) -> tuple[list[BasicMemMessage], MassiveSearchQueryT]:
         """Massive search in the database."""
-        massive_search_response = await self.model.response(
+        massive_search_query = await self.model.response(
             query,
             self.index_context,
             self.format_model,
         )
-        massive_search_query = massive_search_response["queries"]
         partial_results = []
         for single_query in massive_search_query:
             single_query_result = []

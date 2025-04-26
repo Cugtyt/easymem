@@ -1,13 +1,12 @@
 """Model for Basic EasyMem."""
 
 import json
-from typing import Any
 
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from openai import AsyncAzureOpenAI
 from pydantic import BaseModel, ValidationError
 
-from easymem.base.model import ModelBase, ModelResponseError
+from easymem.base.model import MassiveSearchQueryT, ModelBase, ModelResponseError
 
 
 class AzureOpenAIClient(ModelBase):
@@ -36,7 +35,7 @@ class AzureOpenAIClient(ModelBase):
         query: str,
         index_content: str,
         format_model: type[BaseModel],
-    ) -> dict[str, Any]:
+    ) -> MassiveSearchQueryT:
         """Get a response from the Azure OpenAI service."""
         r = await self.client.beta.chat.completions.parse(
             model=self.model,
@@ -51,6 +50,7 @@ class AzureOpenAIClient(ModelBase):
         try:
             res = json.loads(content_str)
             format_model(**res)
+            res = res["queries"]
         except ValidationError as e:
             msg = f"Validation error: {e}"
             raise ModelResponseError(msg) from e

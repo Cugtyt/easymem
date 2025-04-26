@@ -5,10 +5,10 @@ from typing import Annotated
 from pydantic import Field
 from qdrant_client.models import Condition, Filter
 
-from easymem.base.massivesearch import MassiveSearchSpecBase
+from easymem.ext.qdrant.massivesearch import QdrantMassiveSearchProtocol
 
 
-class QdrantVectorMassiveSearch(MassiveSearchSpecBase):
+class QdrantVectorMassiveSearch(QdrantMassiveSearchProtocol):
     """Qdrant vector massive search module for EasyMem."""
 
     query: Annotated[
@@ -36,6 +36,7 @@ class QdrantVectorMassiveSearch(MassiveSearchSpecBase):
         ),
     ]
 
-    async def search_task(self, _: str) -> Condition:
+    async def search_task(self, key: str) -> Condition:
         """Ignored because Qdrant directly supports vector search."""
+        _ = key
         return Filter()

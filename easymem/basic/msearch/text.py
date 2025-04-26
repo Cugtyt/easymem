@@ -5,10 +5,10 @@ from typing import Annotated
 import numpy as np
 from pydantic import Field
 
-from easymem.base.massivesearch import MassiveSearchSpecBase
+from easymem.basic.easymem import BasicMassiveSearchProtocol
 
 
-class BasicTextMassiveSearch(MassiveSearchSpecBase):
+class BasicTextMassiveSearch(BasicMassiveSearchProtocol):
     """Basic text massive search spec."""
 
     keyword: Annotated[

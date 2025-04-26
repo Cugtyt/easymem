@@ -6,10 +6,10 @@ from typing import Annotated
 from pydantic import Field
 from qdrant_client.models import Condition, DatetimeRange, FieldCondition
 
-from easymem.base.massivesearch import MassiveSearchSpecBase
+from easymem.ext.qdrant.massivesearch import QdrantMassiveSearchProtocol
 
 
-class QdrantDatetimeMassiveSearch(MassiveSearchSpecBase):
+class QdrantDatetimeMassiveSearch(QdrantMassiveSearchProtocol):
     """Qdrant date massive search module for EasyMem."""
 
     start_datetime: Annotated[

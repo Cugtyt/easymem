@@ -3,8 +3,6 @@
 from dataclasses import dataclass
 from typing import Annotated
 
-import numpy as np
-
 from easymem.base.massivesearch import MassiveSearchField
 from easymem.basic.massivesearch import BasicMassiveSearchProtocol
 
@@ -42,12 +40,14 @@ class BasicDateMassiveSearch(BasicMassiveSearchProtocol):
         ),
     ]
 
-    async def search_task(self, col: int, data: np.ndarray) -> np.ndarray:
+    async def search_task(self, col: int, data: list[tuple]) -> list[tuple]:
         """Search for messages within the date range."""
-        start_date = np.datetime64(self.start_date)
-        end_date = np.datetime64(self.end_date)
+        if not self.start_date and not self.end_date:
+            return data
 
-        date_column = data[:, col].astype(np.datetime64)
-
-        mask = (date_column >= start_date) & (date_column <= end_date)
-        return data[mask]
+        result = []
+        for row in data:
+            date = row[col]
+            if self.start_date <= date <= self.end_date:
+                result.append(row)
+        return result

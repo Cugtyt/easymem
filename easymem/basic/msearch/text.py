@@ -3,8 +3,6 @@
 from dataclasses import dataclass
 from typing import Annotated
 
-import numpy as np
-
 from easymem.base.massivesearch import MassiveSearchField
 from easymem.basic.massivesearch import BasicMassiveSearchProtocol
 
@@ -28,12 +26,14 @@ class BasicTextMassiveSearch(BasicMassiveSearchProtocol):
         ),
     ]
 
-    async def search_task(self, col: int, data: np.ndarray) -> np.ndarray:
+    async def search_task(self, col: int, data: list[tuple]) -> list[tuple]:
         """Search for messages containing the keywords."""
         if not self.keyword:
             return data
 
-        text_column = data[:, col].astype(str)
-
-        mask = np.array([any(k in text for k in self.keyword) for text in text_column])
-        return data[mask]
+        result = []
+        for row in data:
+            text = row[col]
+            if any(kw.lower() in text.lower() for kw in self.keyword):
+                result.append(row)
+        return result

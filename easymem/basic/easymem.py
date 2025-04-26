@@ -25,20 +25,13 @@ class BasicEasyMem(EasyMemBase):
         super().__init__(message_type, BasicMassiveSearchProtocol)
         self.model = model or AzureOpenAIClient()
         self.columns = {f.name: i for i, f in enumerate(fields(self.message_type), 1)}
-        self.memory: np.ndarray = np.empty((0, len(self.columns) + 1), dtype=object)
+        self.memory: list[tuple] = []
 
     @EasyMemBase.valid_message
     async def add(self, message: Any) -> None:  # noqa: ANN401
         """Add a message to the database."""
         message_id = str(uuid.uuid4())
-        message_content = list(
-            asdict(message).values(),  # type: ignore  # noqa: PGH003
-        )
-        self.memory = np.append(
-            self.memory,
-            np.array([[message_id, *message_content]], dtype=object),
-            axis=0,
-        )
+        self.memory.append((message_id, *asdict(message).values()))
 
     async def massivequery(
         self,

@@ -48,7 +48,8 @@ The final search logic is:
 This structure allows you to create complex search patterns that capture
 different aspects of the user's intent while maintaining logical clarity.
 
-The following is the index information:
+The following is the index information, msearch for each index has the search
+arguments description:
 
 {index_context}
 """

@@ -25,6 +25,9 @@ class QdrantEasyMem(EasyMemBase):
     ) -> None:
         """Initialize the QdrantEasyMem."""
         super().__init__(message_type, QdrantMassiveSearchProtocol)
+        if not hasattr(message_type, "content"):
+            msg = f"{message_type.__name__} must have a 'content' field."
+            raise TypeError(msg)
         self.client = AsyncQdrantClient(
             **(qdrant_client_args or {"location": ":memory:"}),
         )
@@ -78,7 +81,7 @@ class QdrantEasyMem(EasyMemBase):
                 }
                 results.append(
                     self.message_type(
-                        content=r.document,
+                        content=r.document,  # type: ignore  # noqa: PGH003
                         **metadata,
                     ),
                 )

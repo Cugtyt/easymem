@@ -5,7 +5,7 @@ from typing import Annotated
 
 from qdrant_client.models import Condition, Filter
 
-from easymem.base.massivesearch import MassiveSearchField
+from easymem.base import MassiveSearchField
 from easymem.ext.qdrant.massivesearch import QdrantMassiveSearchProtocol
 
 

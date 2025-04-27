@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Annotated
 
-from easymem.base.massivesearch import MassiveSearchField
+from easymem.base import MassiveSearchField
 from easymem.basic.massivesearch import BasicMassiveSearchProtocol
 
 

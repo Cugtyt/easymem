@@ -4,8 +4,7 @@ import uuid
 from dataclasses import asdict, fields
 from typing import Any
 
-from easymem.base.easymem import EasyMemBase
-from easymem.base.model import MassiveSearchQueryT, ModelBase
+from easymem.base import EasyMemBase, MassiveSearchQueryT, ModelBase
 from easymem.basic.massivesearch import BasicMassiveSearchProtocol
 from easymem.basic.message import BasicMemMessage
 from easymem.basic.model import AzureOpenAIClient
@@ -27,7 +26,7 @@ class BasicEasyMem(EasyMemBase):
 
     @EasyMemBase.valid_message
     async def add(self, message: Any) -> None:  # noqa: ANN401
-        """Add a message to the database."""
+        """Add a message."""
         message_id = str(uuid.uuid4())
         self.memory.append((message_id, *asdict(message).values()))
 
@@ -35,7 +34,7 @@ class BasicEasyMem(EasyMemBase):
         self,
         query: str,
     ) -> tuple[list[Any], MassiveSearchQueryT]:
-        """Massive search in the database."""
+        """Massive search."""
         massive_search_query = await self.model.response(
             query,
             self.index_context,

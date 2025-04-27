@@ -11,7 +11,7 @@ from easymem.base.model import MassiveSearchQueryT
 
 
 class EasyMemBase(ABC):
-    """Database class for EasyMem."""
+    """EasyMem base."""
 
     def __init__(
         self,
@@ -51,11 +51,11 @@ class EasyMemBase(ABC):
 
     @abstractmethod
     async def add(self, message: Any) -> None:  # noqa: ANN401
-        """Add a message to the database."""
+        """Add a message to the EasyMem."""
 
     @abstractmethod
     async def massivequery(
         self,
         query: str,
     ) -> tuple[list[Any], MassiveSearchQueryT]:
-        """Massive search in the database."""
+        """Massive search in the EasyMem."""

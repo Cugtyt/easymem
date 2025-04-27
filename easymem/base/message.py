@@ -1,12 +1,10 @@
-"""Base class for memory messages."""
+"""EasyMem message."""
 
 import json
 from dataclasses import asdict, dataclass, fields, is_dataclass
 from typing import Any, get_type_hints
 
 from pydantic import BaseModel, Field, create_model
-
-from easymem.base.massivesearch import MassiveSearchField
 
 
 class MessageHelper:
@@ -19,11 +17,11 @@ class MessageHelper:
     ) -> None:
         """Initialize the EasyMem message helper."""
         self.ensure_types(message_type, protocol)
-        self.parse_message_metadata()
+        self.parse_message()
         self.build_msearch_format_model()
 
     def ensure_types(self, message_type: type, protocol: type) -> None:
-        """Check if the message type is a dataclass with __slots__."""
+        """Ensure the types of message and massive search protocol."""
         if not is_dataclass(message_type) or not hasattr(
             message_type,
             "__slots__",
@@ -71,7 +69,7 @@ class MessageHelper:
         self.protocol = protocol
         self.message_fields = [field.name for field in fields(message_type)]
 
-    def parse_message_metadata(self) -> None:
+    def parse_message(self) -> None:
         """Parse the message metadata."""
         self.massive_search_types: dict[str, type] = {}
         index_context: dict[str, dict] = {}
@@ -160,3 +158,11 @@ class MessageField:
                 massive_search_fields[0],
             )
         return result
+
+
+@dataclass
+class MassiveSearchField:
+    """Massive search field."""
+
+    description: str
+    examples: list

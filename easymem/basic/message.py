@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Annotated
 
-from easymem.base.message import MessageField
+from easymem.base import MessageField
 from easymem.basic.msearch.date import BasicDateMassiveSearch
 from easymem.basic.msearch.text import BasicTextMassiveSearch
 

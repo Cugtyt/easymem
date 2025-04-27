@@ -1,9 +1,9 @@
 """Qdrant EasyMem message."""
 
 from dataclasses import dataclass
-from typing import Annotated, TypeVar
+from typing import Annotated
 
-from easymem.base.message import MessageField
+from easymem.base import MessageField
 from easymem.ext.qdrant.msearch.date import QdrantDatetimeMassiveSearch
 from easymem.ext.qdrant.msearch.vector import QdrantVectorMassiveSearch
 
@@ -37,6 +37,3 @@ class QdrantMemMessage:
             msearch=QdrantDatetimeMassiveSearch,
         ),
     ]
-
-
-QdrantMemMessageT = TypeVar("QdrantMemMessageT", bound=QdrantMemMessage)

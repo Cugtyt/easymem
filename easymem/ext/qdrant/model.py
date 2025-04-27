@@ -6,7 +6,7 @@ from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from openai import AsyncAzureOpenAI
 from pydantic import BaseModel, ValidationError
 
-from easymem.base.model import MassiveSearchQueryT, ModelBase, ModelResponseError
+from easymem.base import MassiveSearchQueryT, ModelBase, ModelResponseError
 
 
 class AzureOpenAIClient(ModelBase):

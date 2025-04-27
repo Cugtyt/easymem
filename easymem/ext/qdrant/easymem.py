@@ -6,8 +6,7 @@ from typing import Any
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import Filter
 
-from easymem.base.easymem import EasyMemBase
-from easymem.base.model import MassiveSearchQueryT, ModelBase
+from easymem.base import EasyMemBase, MassiveSearchQueryT, ModelBase
 from easymem.basic.model import AzureOpenAIClient
 from easymem.ext.qdrant.massivesearch import QdrantMassiveSearchProtocol
 from easymem.ext.qdrant.message import QdrantMemMessage
@@ -36,7 +35,7 @@ class QdrantEasyMem(EasyMemBase):
 
     @EasyMemBase.valid_message
     async def add(self, message: Any) -> None:  # noqa: ANN401
-        """Add a message to the database."""
+        """Add a message."""
         metadata = {k: v for k, v in asdict(message).items() if k != "content"}
         await self.client.add(
             collection_name=self.collection_name,
@@ -48,7 +47,7 @@ class QdrantEasyMem(EasyMemBase):
         self,
         query: str,
     ) -> tuple[list[Any], MassiveSearchQueryT]:
-        """Massive search in the database."""
+        """Massive search."""
         massive_search_query = await self.model.response(
             query,
             self.index_context,

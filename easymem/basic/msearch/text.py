@@ -3,13 +3,13 @@
 from dataclasses import dataclass
 from typing import Annotated
 
-from easymem.base.massivesearch import MassiveSearchField
+from easymem.base import MassiveSearchField
 from easymem.basic.massivesearch import BasicMassiveSearchProtocol
 
 
 @dataclass(slots=True)
 class BasicTextMassiveSearch(BasicMassiveSearchProtocol):
-    """Basic text massive search spec."""
+    """Basic text massive search."""
 
     keyword: Annotated[
         list[str],
